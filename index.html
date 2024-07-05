@@ -5,26 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Image Download Website</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .image-gallery img {
+            max-width: 300px;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
     <h1>Welcome to My Image Download Website</h1>
 
-    <!-- Download Links for Images -->
-    <h2>Available Images for Download</h2>
-    <ul>
-        <li><a href="images/images (93).jpeg" download>Download Image 1</a></li>
-        <li><a href="images/images (94).jpeg" download>Download Image 2</a></li>
-        <!-- Add more images as needed -->
-    </ul>
-
-    <!-- Display Images (if desired) -->
+    <!-- Displayed Images -->
     <h2>Displayed Images</h2>
     <div class="image-gallery">
-        <img src="images/image1.jpg" alt="Image 1">
-        <img src="images/image2.jpg" alt="Image 2">
-        <!-- Add more <img> tags for displayed images -->
+        <div>
+            <img src="images (93).jpeg" alt="Image 1">
+            <br>
+            <a href="images (93).jpeg" download>Download Image 1</a>
+        </div>
+        <div>
+            <img src="images (94).jpeg" alt="Image 2">
+            <br>
+            <a href="images (94).jpeg" download>Download Image 2</a>
+        </div>
+        <!-- Add more images as needed -->
     </div>
 
     <script src="js/scripts.js"></script>
 </body>
 </html>
+
