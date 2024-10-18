@@ -1,0 +1,347 @@
+import java.util.*;
+
+class Flight {
+    private String flightNumber;
+    private String origin;
+    private String destination;
+    private String date;
+    private String time;
+    private String duration;
+    private double baseFareEconomy;
+    private double baseFarePremiumEconomy;
+    private double baseFareBusiness;
+    private double baseFareFirstClass;
+    private Map<String, Integer> classSeats;
+
+    public Flight(String flightNumber, String origin, String destination, String date, String time, String duration, 
+                  int economySeats, int premiumEconomySeats, int businessSeats, int firstClassSeats,
+                  double baseFareEconomy, double baseFarePremiumEconomy, double baseFareBusiness, double baseFareFirstClass) {
+        this.flightNumber = flightNumber;
+        this.origin = origin;
+        this.destination = destination;
+        this.date = date;
+        this.time = time;
+        this.duration = duration;
+        this.baseFareEconomy = baseFareEconomy;
+        this.baseFarePremiumEconomy = baseFarePremiumEconomy;
+        this.baseFareBusiness = baseFareBusiness;
+        this.baseFareFirstClass = baseFareFirstClass;
+
+        classSeats = new HashMap<>();
+        classSeats.put("Economy", economySeats);
+        classSeats.put("Premium Economy", premiumEconomySeats);
+        classSeats.put("Business", businessSeats);
+        classSeats.put("First Class", firstClassSeats);
+    }
+
+    public String getFlightNumber() {
+        return flightNumber;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public double getBaseFare(String classType) {
+        switch (classType) {
+            case "Economy": return baseFareEconomy;
+            case "Premium Economy": return baseFarePremiumEconomy;
+            case "Business": return baseFareBusiness;
+            case "First Class": return baseFareFirstClass;
+            default: return baseFareEconomy;
+        }
+    }
+
+    public int getAvailableSeats(String classType) {
+        return classSeats.getOrDefault(classType, 0);
+    }
+
+    public boolean bookSeat(String classType) {
+        if (classSeats.containsKey(classType) && classSeats.get(classType) > 0) {
+            classSeats.put(classType, classSeats.get(classType) - 1);
+            return true;
+        }
+        return false;
+    }
+
+    public void cancelSeat(String classType) {
+        if (classSeats.containsKey(classType)) {
+            classSeats.put(classType, classSeats.get(classType) + 1);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Flight Number: " + flightNumber + 
+               ", Origin: " + origin + 
+               ", Destination: " + destination + 
+               ", Date: " + date + 
+               ", Time: " + time + 
+               ", Duration: " + duration + 
+               ", Available Seats - Economy: " + getAvailableSeats("Economy") +
+               ", Premium Economy: " + getAvailableSeats("Premium Economy") +
+               ", Business: " + getAvailableSeats("Business") +
+               ", First Class: " + getAvailableSeats("First Class");
+    }
+}
+
+class Reservation {
+    private String passengerName;
+    private Flight flight;
+    private String classType;
+    private String fareType;
+    private double baseFare;
+    private double finalFare;
+    private double taxes;
+    private double additionalCharges;
+    private double foodCharges;
+    private double totalAmount;
+
+    public Reservation(String passengerName, Flight flight, String classType, String fareType, double baseFare, double finalFare, double taxes, double additionalCharges, double foodCharges, double totalAmount) {
+        this.passengerName = passengerName;
+        this.flight = flight;
+        this.classType = classType;
+        this.fareType = fareType;
+        this.baseFare = baseFare;
+        this.finalFare = finalFare;
+        this.taxes = taxes;
+        this.additionalCharges = additionalCharges;
+        this.foodCharges = foodCharges;
+        this.totalAmount = totalAmount;
+    }
+
+    public String getPassengerName() {
+        return passengerName;
+    }
+
+    public Flight getFlight() {
+        return flight;
+    }
+
+    @Override
+    public String toString() {
+        return "\n--- Reservation Details ---" +
+               "\nPassenger Name: " + passengerName + 
+               "\nFlight Number: " + flight.getFlightNumber() + 
+               "\nClass: " + classType + 
+               "\nFare Type: " + fareType + 
+               "\nBase Fare: $" + baseFare + 
+               "\nDiscounted Fare (after applying " + fareType + " discount): $" + finalFare + 
+               "\nTaxes (5% GST): $" + taxes + 
+               "\nAdditional Charges (Service Fee): $" + additionalCharges + 
+               "\nFood Charges: $" + foodCharges + 
+               "\nTotal Amount: $" + totalAmount +  
+               "\nOrigin: " + flight.getOrigin() + 
+               "\nDestination: " + flight.getDestination() + 
+               "\nDate: " + flight.getDate() + 
+               "\nTime: " + flight.getTime();
+    }
+}
+
+public class AirwaysReservationSystem {
+    private List<Flight> flights = new ArrayList<>();
+    private List<Reservation> reservations = new ArrayList<>();
+    private Scanner scanner = new Scanner(System.in);
+    private static final String DEFAULT_ORIGIN = "New York";
+
+    public void addFlight(String flightNumber, String destination, String date, String time, String duration, 
+                          int economySeats, int premiumEconomySeats, int businessSeats, int firstClassSeats,
+                          double baseFareEconomy, double baseFarePremiumEconomy, double baseFareBusiness, double baseFareFirstClass) {
+        flights.add(new Flight(flightNumber, DEFAULT_ORIGIN, destination, date, time, duration, 
+                               economySeats, premiumEconomySeats, businessSeats, firstClassSeats,
+                               baseFareEconomy, baseFarePremiumEconomy, baseFareBusiness, baseFareFirstClass));
+    }
+
+    public void displayAvailableFlights() {
+        System.out.println("\nAvailable Flights:");
+        for (Flight flight : flights) {
+            System.out.println(flight);
+        }
+    }
+
+    public void bookFlight() {
+        System.out.println("\nEnter your name:");
+        String passengerName = scanner.nextLine();
+        System.out.println("Enter flight number to book:");
+        String flightNumber = scanner.nextLine();
+
+        Flight selectedFlight = null;
+        for (Flight flight : flights) {
+            if (flight.getFlightNumber().equalsIgnoreCase(flightNumber)) {
+                selectedFlight = flight;
+                break;
+            }
+        }
+
+        if (selectedFlight == null) {
+            System.out.println("Flight not found.");
+            return;
+        }
+
+        System.out.println("Select class to book (Economy, Premium Economy, Business, First Class):");
+        String classType = scanner.nextLine().trim().toLowerCase();
+
+        switch (classType) {
+            case "economy": classType = "Economy"; break;
+            case "premium economy": classType = "Premium Economy"; break;
+            case "business": classType = "Business"; break;
+            case "first class": classType = "First Class"; break;
+            default:
+                System.out.println("Invalid class type. Please try again.");
+                return;
+        }
+
+        if (!selectedFlight.bookSeat(classType)) {
+            System.out.println("No available seats in " + classType + " class.");
+            return;
+        }
+
+        System.out.println("Select fare type:");
+        System.out.println("1. Regular");
+        System.out.println("2. Senior Citizen");
+        System.out.println("3. Armed Forces");
+        System.out.println("4. Student");
+        System.out.println("5. Doctor/Nurses");
+        System.out.println("6. Physically Disabled");
+        int fareChoice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        String fareType;
+        double fareMultiplier;
+        switch (fareChoice) {
+            case 1: fareType = "Regular"; fareMultiplier = 1.0; break;
+            case 2: fareType = "Senior Citizen"; fareMultiplier = 0.8; break;
+            case 3: fareType = "Armed Forces"; fareMultiplier = 0.85; break;
+            case 4: fareType = "Student"; fareMultiplier = 0.9; break;
+            case 5: fareType = "Doctor/Nurses"; fareMultiplier = 0.85; break;
+            case 6: fareType = "Physically Disabled"; fareMultiplier = 0.7; break;
+            default: 
+                System.out.println("Invalid choice, defaulting to Regular.");
+                fareType = "Regular";
+                fareMultiplier = 1.0;
+                break;
+        }
+
+        double baseFare = selectedFlight.getBaseFare(classType);
+        double finalFare = baseFare * fareMultiplier;
+        double taxes = finalFare * 0.05; // 5% GST
+        double additionalCharges = 200; // Service Fee
+
+        System.out.println("Do you want to opt for food service?");
+        System.out.println("1. No food");
+        System.out.println("2. Snacks only ($150)");
+        System.out.println("3. Lunch only ($300)");
+        System.out.println("4. Both Snacks and Lunch ($400)");
+        int foodChoice = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        double foodCharges;
+        switch (foodChoice) {
+            case 2: foodCharges = 150; break;
+            case 3: foodCharges = 300; break;
+            case 4: foodCharges = 400; break;
+            case 1:
+            default: foodCharges = 0; break;
+        }
+
+        double totalAmount = finalFare + taxes + additionalCharges + foodCharges;
+
+        reservations.add(new Reservation(passengerName, selectedFlight, classType, fareType, baseFare, finalFare, taxes, additionalCharges, foodCharges, totalAmount));
+        System.out.println("Reservation successful for " + classType + " class with " + fareType + " fare.");
+        System.out.println("Total bill: $" + totalAmount + 
+                           "\nIncludes:" +
+                           "\n- Name: " + passengerName +
+                           "\n- Class: " + classType +
+                           "\n- Fare Type: " + fareType +
+                           "\n- Base Fare: $" + baseFare +
+                           "\n- Final Fare (after discount): $" + finalFare +
+                           "\n- Taxes (5% GST): $" + taxes +
+                           "\n- Additional Charges (Service Fee): $" + additionalCharges +
+                           "\n- Food Charges: $" + foodCharges);
+    }
+
+    public void cancelBooking() {
+        System.out.println("\nEnter your name to cancel the booking:");
+        String passengerName = scanner.nextLine();
+
+        Reservation reservationToCancel = null;
+        for (Reservation reservation : reservations) {
+            if (reservation.getPassengerName().equalsIgnoreCase(passengerName)) {
+                reservationToCancel = reservation;
+                break;
+            }
+        }
+
+        if (reservationToCancel == null) {
+            System.out.println("No reservation found for the name: " + passengerName);
+            return;
+        }
+
+        // Cancel the seat in the flight
+        reservationToCancel.getFlight().cancelSeat(reservationToCancel.getFlight().getFlightNumber());
+        reservations.remove(reservationToCancel);
+        System.out.println("Reservation for " + passengerName + " has been successfully canceled.");
+    }
+
+    public void displayReservations() {
+        System.out.println("\nReservations:");
+        if (reservations.isEmpty()) {
+            System.out.println("No reservations found.");
+        } else {
+            for (Reservation reservation : reservations) {
+                System.out.println(reservation);
+            }
+        }
+    }
+
+    public void showMenu() {
+        while (true) {
+            System.out.println("\nAirways Reservation System");
+            System.out.println("1. Display available flights");
+            System.out.println("2. Book a flight");
+            System.out.println("3. Cancel a booking");
+            System.out.println("4. View reservations");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1: displayAvailableFlights(); break;
+                case 2: bookFlight(); break;
+                case 3: cancelBooking(); break;
+                case 4: displayReservations(); break;
+                case 5: 
+                    System.out.println("Thank you for using the Airways Reservation System.");
+                    return;
+                default: 
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        AirwaysReservationSystem system = new AirwaysReservationSystem();
+        system.addFlight("A101", "Los Angeles", "2024-10-20", "08:00 AM", "5h 30m", 5, 3, 2, 1, 3000, 4500, 6000, 8000);
+        system.addFlight("B202", "Miami", "2024-10-21", "09:30 AM", "3h 15m", 10, 5, 3, 2, 2000, 3500, 5000, 7000);
+        system.addFlight("C303", "San Francisco", "2024-10-22", "11:00 AM", "6h 0m", 8, 4, 2, 1, 4000, 5500, 7500, 9500);
+
+        system.showMenu();
+    }
+}
